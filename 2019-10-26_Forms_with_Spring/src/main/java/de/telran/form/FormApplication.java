@@ -1,4 +1,3 @@
-// Yan Kelsh
 package de.telran.form;
 
 import org.springframework.boot.SpringApplication;
