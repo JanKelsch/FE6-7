@@ -18,7 +18,8 @@ export class ValidationErrorsComponent implements OnInit {
   @Input()
   translations: any;
 
-  constructor() { }
+  constructor() {
+  }
 
   ngOnInit() {
   }
@@ -26,23 +27,33 @@ export class ValidationErrorsComponent implements OnInit {
   errors(): ErrorItem[] {
     const errors: ErrorItem[] = [];
     for (const errorName of Object.keys(this.control.errors)) {
-      let errorTranslation = this.translations[errorName];
-      const placeholder = this.getPlaceholder(this.translations[errorName]);
-      errorTranslation = errorTranslation.replace(
-        '{{' + placeholder + '}}', this.control.errors[errorName][placeholder]
-        );
+      const errorTranslation = this.changePlaceHoldersToValues(errorName);
       errors.push({
         name: errorName,
-        value: errorTranslation,
+        value: errorTranslation
       });
     }
     return errors;
   }
 
-  getPlaceholder(str: string) {
-    return str.substring(
-      str.lastIndexOf('{{') + 2,
-      str.lastIndexOf('}}')
-    );
+  getPlaceholders(str: string): string[] {
+    const res: string[] = [];
+    while (str.includes('{{')) {
+      res.push(str.substring(str.indexOf('{{') + 2, str.indexOf('}}')));
+      str = str.slice(str.indexOf('}}') + 2);
+    }
+    return res;
   }
+
+  changePlaceHoldersToValues(errorName: string): string {
+    let errorTranslation: string = this.translations[errorName];
+    const placeholders = this.getPlaceholders(this.translations[errorName]);
+    for (const placeholder of placeholders) {
+      errorTranslation = errorTranslation.replace(
+        '{{' + placeholder + '}}', this.control.errors[errorName][placeholder]
+      );
+    }
+    return errorTranslation;
+  }
+
 }
